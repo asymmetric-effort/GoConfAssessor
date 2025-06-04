@@ -6,6 +6,12 @@ general:
     author: "Sam Caldwell"
     created_on: "2025-06-03"
 
+facts:
+  - name: "ntp-server"
+    include: "ntp-servers.yml"
+  - name: "dns-server"
+    include: "dns-servers.yml"
+
 patterns:
   - pattern: "rfc1123addresses"
     include: "patterns/rfc-1123.yaml"
