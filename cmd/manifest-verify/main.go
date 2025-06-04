@@ -4,7 +4,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/sam-caldwell/GoConfAssessor/pkg/manifest"
 	"log"
 	"os"
@@ -26,28 +25,19 @@ func main() {
 		log.Println("Debug mode enabled")
 	}
 
+	var (
+		rootManifest manifest.RootManifest
+		err          error
+	)
 	// Load and resolve the manifest tree
-	rootManifest, err := manifest.LoadAndResolve(*manifestPath)
-	if err != nil {
+	if rootManifest, err = manifest.LoadAndResolve(*manifestPath); err != nil {
 		log.Fatalf("Failed to load or resolve manifest %q: %v", *manifestPath, err)
 	}
-
-	// TODO: Verify each field of rootManifest for legitimate values:
-	//  - general.name non-empty
-	//  - general.version follows semantic version format
-	//  - metadata entries are key->string
-	//  - each group has non-empty Name
-	//  - each assertion:
-	//      * Label non-empty
-	//      * Parser is one of the allowed parsers
-	//      * AppliesTo non-empty
-	//      * Statement non-empty
-	//      * Expected.Type is valid and Expected.Value matches type
-	//      * Weight >= 0
-	//      * Source has at least Path or Pattern
-	//      * Operator is one of matches|contains|equals
+	if err = rootManifest.Validate(); err != nil {
+		log.Fatal(err)
+	}
 
 	// For now, assume manifest.LoadAndResolve performs all syntax checks.
-	fmt.Println("Manifest successfully loaded and resolved:", rootManifest)
-	fmt.Println("Manifest verification passed.")
+	log.Println("Manifest successfully loaded and resolved:", rootManifest)
+	log.Println("Manifest verification passed.")
 }

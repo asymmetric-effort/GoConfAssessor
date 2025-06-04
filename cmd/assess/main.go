@@ -1,4 +1,5 @@
 // file: cmd/assess/main.go
+// (c) 2025 Asymmetric Effort, LLC. <scaldwell@asymmetric-effort.com>
 package main
 
 import (
@@ -13,6 +14,11 @@ import (
 	"github.com/sam-caldwell/GoConfAssessor/pkg/report"
 )
 
+/**
+ * This program performs an assessment of a directory of source config files
+ * against a YAML manifest tree of assertions and produces a YAML report file
+ * attesting to the outcome of the assessment.
+ */
 func main() {
 	// Define flags
 	debug := flag.Bool("debug", false, "Enable debug‐level logging")
