@@ -7,12 +7,10 @@ general:
     created_on: "2025-06-03"
 
 patterns:
-  - pattern:
-      name: "rfc1123addresses"
-      include: "patterns/rfc-1123.yaml"
-  - pattern:
-      name: "simple_identifier"
-      regex: "[a-zA-Z][a-zA-Z0-9\\_]{1,64}"
+  - pattern: "rfc1123addresses"
+    include: "patterns/rfc-1123.yaml"
+  - pattern: "simple_identifier"
+    regex: "[a-zA-Z][a-zA-Z0-9\\_]{1,64}"
 
 assertions:
   # We can create a chain of all YAML assertion manifests to form a chain for analysis.
