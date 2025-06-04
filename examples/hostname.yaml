@@ -1,0 +1,6 @@
+---
+assertions:
+  # we include a succession of YAML files
+  # but only those with a matching applies-to will be applied to a given target device.
+  - include: "hostname/cisco-ios.yaml"
+  - include: "hostname/juniper.yaml"

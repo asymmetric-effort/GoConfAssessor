@@ -1,0 +1,16 @@
+---
+assertions:
+  - name: "hostname-checks"
+    items:
+      - label: "verify device has hostname"
+        applies_to:
+          - "juniper"
+        parser: "juniper"
+        statement: "Each device must have a hostname"
+        expected:
+          type: "pattern"
+          value: <rfc1123 regex>
+        weight: 10
+        source:
+          pattern: "<a regex to look up the hostname>"
+        operator: "<matches|contains|equals>"

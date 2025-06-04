@@ -1,0 +1,18 @@
+---
+assertions:
+  - name: "dns-checks"
+    items:
+      - label: "<string: unique within this group>"
+        parser: "<string: one of cisco-ios.yaml | juniper | arista | yaml | json | ini | text>"
+        applies_to:
+          - "<string: tag1>"
+          - "<string: tag2>"
+        statement: "<string: description of the standard being asserted>"
+        expected:
+          type: "<bool|string|int|float|list|map>"
+          value: <literal matching the declared type>
+        weight: <integer>
+        source:
+          path: "<string: parsed-config parameter-tree path>"
+          pattern: "<string: regex to apply against raw config>"
+        operator: "<matches|contains|equals>"
