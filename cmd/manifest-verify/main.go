@@ -5,7 +5,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/sam-caldwell/GoConfAssessor/manifest"
+	"github.com/sam-caldwell/GoConfAssessor/pkg/manifest"
 	"log"
 	"os"
 )
