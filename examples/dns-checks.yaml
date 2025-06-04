@@ -3,7 +3,7 @@ assertions:
   - name: "dns-checks"
     items:
       - label: "<string: unique within this group>"
-        parser: "<string: one of cisco-ios.yaml | juniper | arista | yaml | json | ini | text>"
+        parser: "<string: cisco-ios | juniper | arista | yaml | json | ini | text>"
         applies_to:
           - "<string: tag1>"
           - "<string: tag2>"
