@@ -9,8 +9,8 @@ assertions:
         statement: "Each device must have a hostname"
         expected:
           type: "pattern"
-          value: <rfc1123 regex>
+          value: "^[A-Za-z0-9]([A-Za-z0-9\\-]{0,61}[A-Za-z0-9])?$"
         weight: 10
         source:
-          pattern: "<a regex to look up the hostname>"
-        operator: "<matches|contains|equals>"
+          pattern: "^\\s*set\\s+system\\s+host-name\\s+\\S+"
+        operator: "matches"

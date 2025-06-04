@@ -9,10 +9,10 @@ assertions:
           - "<string: tag2>"
         statement: "<string: description of the standard being asserted>"
         expected:
-          type: "<bool|string|int|float|list|map>"
-          value: <literal matching the declared type>
-        weight: <integer>
+          type: string
+          value: "10.10.10.10"
+        weight: 100
         source:
-          path: "<string: parsed-config parameter-tree path>"
-          pattern: "<string: regex to apply against raw config>"
+          path: "ntp.servers""
+          pattern: "^ntp-server\ : .+$"
         operator: "<matches|contains|equals>"
