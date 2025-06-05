@@ -1,0 +1,4 @@
+- pattern: "rfc1123_label"
+  regex: "^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$"
+- pattern: "rfc1123_hostname"
+  regex: "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[A-Za-z]{2,}$"

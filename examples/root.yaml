@@ -12,8 +12,8 @@ general:
 # FACTS: collections of known-true data.
 #
 facts:
-  - include: "facts/ntp-servers.yml"
-  - include: "facts/dns-servers.yml"
+  - include: "examples/facts/ntp-servers.yml"
+  - include: "examples/facts/dns-servers.yml"
   - fact:
       name: "example1"
       data:
@@ -36,7 +36,7 @@ facts:
 # PATTERNS: regular expressions used to match configuration patterns
 #
 patterns:
-  - include: "patterns/rfc-1123.yaml"
+  - include: "examples/patterns/rfc-1123.yaml"
   - pattern: "simple_identifier"
     regex: "[a-zA-Z][a-zA-Z0-9\\_]{1,64}"
 #
@@ -44,6 +44,6 @@ patterns:
 #
 assertions:
   # We can create a chain of all YAML assertion manifests to form a chain for analysis.
-  - include: "assertions/hostname.yaml"
-  - include: "assertions/ntp-checks.yaml"
-  - include: "assertions/dns-checks.yaml"
+  - include: "examples/assertions/hostname.yaml"
+  - include: "examples/assertions/ntp-checks.yaml"
+  - include: "examples/assertions/dns-checks.yaml"

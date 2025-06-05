@@ -4,8 +4,8 @@ package main
 
 import (
 	"flag"
+	"github.com/sam-caldwell/GoConfAssessor/pkg/logger"
 	"github.com/sam-caldwell/GoConfAssessor/pkg/manifest"
-	"log"
 	"os"
 )
 
@@ -20,10 +20,17 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
+	log := logger.Logger
 	if *debug {
-		log.SetFlags(log.LstdFlags | log.Lshortfile)
-		log.Println("Debug mode enabled")
+		if err := logger.SetLevel("debug"); err != nil {
+			log.Fatalf("error setting log level: %v", err)
+		}
+	} else {
+		if err := logger.SetLevel("info"); err != nil {
+			log.Fatalf("error setting log level: %v", err)
+		}
 	}
+	log.Debug("logger ready")
 
 	var (
 		rootManifest manifest.Manifest
@@ -36,6 +43,5 @@ func main() {
 	}
 
 	// For now, assume manifest.Load performs all syntax checks.
-	log.Println("Manifest successfully loaded and resolved:", rootManifest)
-	log.Println("Manifest verification passed.")
+	log.Info("Manifest successfully loaded and resolved:", rootManifest)
 }

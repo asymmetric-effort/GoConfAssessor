@@ -8,7 +8,7 @@ type Manifest struct {
 	//
 	// The General section is required only in the root manifest
 	// This is mostly metadata, versioning and other information used to organize information.
-	General GeneralSection `yaml:"general:omitempty"`
+	General GeneralSection `yaml:"general,omitempty"`
 	//
 	// Facts are data which can be defined in files and referenced by assertions.
 	// For example, a "fact" might be a list of dns servers assertions can reference
@@ -23,5 +23,5 @@ type Manifest struct {
 	// Assertions are groups of statements which can be evaluated against an analyzed configuration
 	// using facts and patterns.  Assertions must be true, or they will fail, and reports from assessing
 	// these assertions record the pass/fail state of the assertion.
-	Assertions []AssertionGroup `yaml:"assertions,omitempty""`
+	Assertions []AssertionGroup `yaml:"assertions,omitempty"`
 }

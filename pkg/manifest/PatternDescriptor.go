@@ -7,10 +7,6 @@ package manifest
 // this can be referenced later using the pattern::<name> format
 type PatternDescriptor struct {
 	Include string `yaml:"include,omitempty"`
-
-	Pattern struct {
-		Name string `yaml:"name"`
-
-		Regex string `yaml:"regex,omitempty"`
-	} `yaml:"pattern"`
+	Pattern string `yaml:"pattern,omitempty"`
+	Regex   string `yaml:"regex,omitempty"`
 }

@@ -3,30 +3,31 @@
 
 package manifest
 
-import "github.com/sam-caldwell/GoConfAssessor/pkg/utils"
+import (
+	"fmt"
+	"github.com/sam-caldwell/GoConfAssessor/pkg/logger"
+	"github.com/sam-caldwell/GoConfAssessor/pkg/utils"
+)
 
-func (manifest *Manifest) LoadPatterns() (err error) {
+func (m *Manifest) LoadPatterns() error {
+	log := logger.Logger
 
-	var resolve func(thesePatterns []PatternDescriptor) error
-
-	resolve = func(thesePatterns []PatternDescriptor) error {
-
-		for _, fact := range thesePatterns {
-
-			if childInclude := fact.Include; childInclude != "" {
-
-				var newPatterns PatternDescriptor
-				if err = utils.LoadYaml(childInclude, &newPatterns); err != nil {
-					return err
-				}
-
-				thesePatterns = append(thesePatterns, newPatterns)
-				if err := resolve([]PatternDescriptor{newPatterns}); err != nil {
-					return err
-				}
-			}
+	for i := 0; i < len(m.Patterns); i++ {
+		p := m.Patterns[i]
+		if p.Include == "" {
+			log.Debugf("Pattern %d has no include", i)
+			continue
 		}
-		return nil
+
+		log.Debugf("Pattern %d includes '%s'", i, p.Include)
+		var nested []PatternDescriptor
+		if err := utils.LoadYaml(p.Include, &nested); err != nil {
+			return fmt.Errorf("failed to load patterns from %s: %w", p.Include, err)
+		}
+
+		// Append all loaded patterns so they also get checked for nested includes (if you ever support them)
+		m.Patterns = append(m.Patterns, nested...)
 	}
-	return resolve(manifest.Patterns)
+
+	return nil
 }

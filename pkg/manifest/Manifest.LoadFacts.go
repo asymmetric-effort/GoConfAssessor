@@ -3,27 +3,36 @@
 
 package manifest
 
-import "github.com/sam-caldwell/GoConfAssessor/pkg/utils"
+import (
+	"fmt"
 
-// LoadFacts - Load facts for the manifest
-func (manifest *Manifest) LoadFacts() (err error) {
+	"github.com/sam-caldwell/GoConfAssessor/pkg/logger"
+	"github.com/sam-caldwell/GoConfAssessor/pkg/utils"
+)
 
-	var resolve func(theseFacts []FactDescriptor) error
+// LoadFacts recursively loads and flattens all fact includes into manifest.Facts.
+// Any entry with Include set is replaced by the contents of that YAML file.
+// The included file must contain a YAML sequence of “- fact:” entries.
+func (manifest *Manifest) LoadFacts() error {
+	log := logger.Logger
 
-	resolve = func(theseFacts []FactDescriptor) error {
-		for _, fact := range theseFacts {
-			if childInclude := fact.Include; childInclude != "" {
-				var newFacts FactDescriptor
-				if err = utils.LoadYaml(childInclude, &newFacts); err != nil {
-					return err
-				}
-				theseFacts = append(theseFacts, newFacts)
-				if err := resolve([]FactDescriptor{newFacts}); err != nil {
-					return err
-				}
-			}
+	// Iterate over manifest.Facts, expanding includes as we go.
+	for i := 0; i < len(manifest.Facts); i++ {
+		f := manifest.Facts[i]
+		if f.Include == "" {
+			log.Debugf("Fact %d has no include", i)
+			continue
 		}
-		return nil
+
+		log.Debugf("Fact %d includes '%s'", i, f.Include)
+		var nested []FactDescriptor
+		if err := utils.LoadYaml(f.Include, &nested); err != nil {
+			return fmt.Errorf("failed to load facts from %s: %w", f.Include, err)
+		}
+
+		// Append all loaded facts so they will also be processed for nested includes.
+		manifest.Facts = append(manifest.Facts, nested...)
 	}
-	return resolve(manifest.Facts)
+
+	return nil
 }

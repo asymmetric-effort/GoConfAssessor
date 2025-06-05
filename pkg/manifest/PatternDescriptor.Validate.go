@@ -7,10 +7,10 @@ import (
 
 // Validate - validate the PatternDescriptor
 func (descriptor *PatternDescriptor) Validate() (err error) {
-	if err = utils.ValidIdentifier(descriptor.Pattern.Name); err != nil {
+	if err = utils.ValidIdentifier(descriptor.Pattern); err != nil {
 		return err
 	}
-	if descriptor.Pattern.Regex == "" {
+	if descriptor.Regex == "" {
 		return fmt.Errorf("pattern regex cannot be empty")
 	}
 	return err
