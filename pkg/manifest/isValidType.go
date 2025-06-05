@@ -4,8 +4,9 @@
 package manifest
 
 func isValidType(t string) bool {
+	// Added "pattern" as a valid type for regex-based assertions.
 	switch t {
-	case "bool", "string", "int", "float", "list", "map":
+	case "bool", "string", "int", "float", "list", "map", "pattern":
 		return true
 	}
 	return false

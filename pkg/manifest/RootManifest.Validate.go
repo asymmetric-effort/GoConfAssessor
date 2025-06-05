@@ -1,4 +1,4 @@
-// file: pkg/manifest/RootManifest.Validate.go
+// file: pkg/manifest/Manifest.Validate.go
 // (c) 2025 Asymmetric Effort, LLC. <scaldwell@asymmetric-effort.com>
 
 package manifest
@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Validate checks that the RootManifest contains valid fields and formats.
+// Validate checks that the Manifest contains valid fields and formats.
 // This program will verify each field of rootManifest for legitimate values:
 //   - general.name non-empty
 //   - general.version follows semantic version format
@@ -23,40 +23,15 @@ import (
 //   - Weight >= 0
 //   - Source has at least Path or Pattern
 //   - Operator is one of matches|contains|equals
-func (rm *RootManifest) Validate() error {
-	// General.name must be a non-empty string
-	name, ok := rm.General["name"].(string)
-	if !ok || name == "" {
-		return errors.New("manifest general.name must be a non-empty string")
-	}
+func (manifest *Manifest) Validate() (err error) {
 
-	// General.version must follow semantic versioning (e.g., 1.0.0)
-	version, ok := rm.General["version"].(string)
-	if !ok || !isValidSemVer(version) {
-		return fmt.Errorf("manifest general.version invalid semver: %v", rm.General["version"])
-	}
-
-	// Metadata entries, if present, must be key->string
-	if metaList, exists := rm.General["metadata"]; exists {
-		entries, ok := metaList.([]interface{})
-		if !ok {
-			return errors.New("manifest general.metadata must be a sequence of key->string maps")
-		}
-		for _, entry := range entries {
-			m, ok := entry.(map[string]interface{})
-			if !ok || len(m) != 1 {
-				return errors.New("each metadata entry must be a single key->string map")
-			}
-			for _, v := range m {
-				if _, ok := v.(string); !ok {
-					return errors.New("metadata values must be strings")
-				}
-			}
-		}
+	// validate the general section
+	if err = manifest.General.Validate(); err != nil {
+		return err
 	}
 
 	// Validate each group and its assertions
-	for _, group := range rm.Assertions {
+	for _, group := range manifest.Assertions {
 		if group.Name == "" {
 			return errors.New("each group must have a non-empty Name")
 		}

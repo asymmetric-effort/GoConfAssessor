@@ -44,6 +44,6 @@ patterns:
 #
 assertions:
   # We can create a chain of all YAML assertion manifests to form a chain for analysis.
-  - include: "hostname.yaml"
-  - include: "ntp-checks.yaml"
-  #- include: "dns-checks.yaml"
+  - include: "assertions/hostname.yaml"
+  - include: "assertions/ntp-checks.yaml"
+  - include: "assertions/dns-checks.yaml"

@@ -12,7 +12,7 @@ func (manifest *Manifest) LoadFacts() (err error) {
 
 	resolve = func(theseFacts []FactDescriptor) error {
 		for _, fact := range theseFacts {
-			if childInclude:=fact.Include; childInclude != "" {
+			if childInclude := fact.Include; childInclude != "" {
 				var newFacts FactDescriptor
 				if err = utils.LoadYaml(childInclude, &newFacts); err != nil {
 					return err
@@ -25,5 +25,5 @@ func (manifest *Manifest) LoadFacts() (err error) {
 		}
 		return nil
 	}
-	return resolve(manifest.Facts))
+	return resolve(manifest.Facts)
 }

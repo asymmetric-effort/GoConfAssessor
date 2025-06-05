@@ -38,7 +38,7 @@ func main() {
 	}
 
 	// 1) Load and preprocess the manifest (resolving includes, prefixing labels, etc.)
-	rootManifest, err := manifest.LoadAndResolve(*manifestPath)
+	rootManifest, err := manifest.Load(*manifestPath)
 	if err != nil {
 		log.Fatalf("Failed to load manifest %q: %v", *manifestPath, err)
 	}

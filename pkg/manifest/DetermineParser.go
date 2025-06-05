@@ -4,7 +4,7 @@
 package manifest
 
 // DetermineParser returns the parser name for a given config file, based on the root manifest and file path.
-func DetermineParser(root RootManifest, configPath string) string {
+func DetermineParser(root Manifest, configPath string) string {
 	// TODO: Implement parser determination logic (e.g., based on file extension or manifest override).
 	return ""
 }

@@ -1,18 +1,15 @@
 ---
 assertions:
   - name: "dns-checks"
+    parser: json
     items:
-      - label: "<string: unique within this group>"
-        parser: "<string: cisco-ios | juniper | arista | yaml | json | ini | text>"
-        applies_to:
-          - "<string: tag1>"
-          - "<string: tag2>"
-        statement: "<string: description of the standard being asserted>"
+      - label: device-dns-servers
+        statement: |
+          All devices will have dns servers configured.
         expected:
-          type: "<bool|string|int|float|list|map>"
-          value: <literal matching the declared type>
-        weight: <integer>
+          type: string
+          value: fact::ntp-servers-east
+        weight: 100
         source:
-          path: "<string: parsed-config parameter-tree path>"
-          pattern: "<string: regex to apply against raw config>"
-        operator: "<matches|contains|equals>"
+          path: ".dns.servers"
+        operator: "contains"

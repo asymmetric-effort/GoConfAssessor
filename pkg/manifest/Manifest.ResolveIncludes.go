@@ -18,5 +18,4 @@ func (manifest *Manifest) ResolveIncludes() (err error) {
 	}
 
 	return err
-
 }

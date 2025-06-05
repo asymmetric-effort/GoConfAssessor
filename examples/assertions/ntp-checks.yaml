@@ -1,18 +1,16 @@
 ---
 assertions:
   - name: "ntp-checks"
+    parser: json
     items:
-      - label: "<string: unique within this group>"
-        parser: "<string: cisco-ios.yaml | juniper | arista | yaml | json | ini | text>"
-        applies_to:
-          - "<string: tag1>"
-          - "<string: tag2>"
-        statement: "<string: description of the standard being asserted>"
+      - label: device-ntp-servers
+        statement: |
+          All devices will have ntp servers configured
         expected:
           type: string
-          value: "10.10.10.10"
+          value: fact::ntp-servers-east
         weight: 100
         source:
-          path: "ntp.servers""
-          pattern: "^ntp-server\ : .+$"
-        operator: "<matches|contains|equals>"
+          # A path relative to the root of the object tree
+          path: ".ntp.servers"
+        operator: "contains"

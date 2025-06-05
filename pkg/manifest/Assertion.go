@@ -5,18 +5,23 @@ package manifest
 
 // Assertion represents a single check in a group.
 type Assertion struct {
-	Label     string
-	Parser    string
-	AppliesTo []string
-	Statement string
-	Expected  struct {
-		Type  string
-		Value interface{}
-	}
-	Weight int
+	Label string `yaml:"label,omitempty"`
+
+	Statement string `yaml:"statement,omitempty"`
+
+	Expected struct {
+		Type string `yaml:"type,omitempty"`
+
+		Value interface{} `yaml:"value,omitempty"`
+	} `yaml:"expected,omitempty"`
+
+	Weight int `yaml:"weight,omitempty"`
+
 	Source struct {
-		Path    string
-		Pattern string
-	}
-	Operator string
+		Path string `yaml:"path,omitempty"`
+
+		Pattern string `yaml:"pattern,omitempty"`
+	} `yaml:"source,omitempty"`
+
+	Operator string `yaml:"operator,omitempty"`
 }
