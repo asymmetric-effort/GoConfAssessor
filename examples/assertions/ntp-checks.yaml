@@ -1,16 +1,14 @@
----
-assertions:
-  - name: "ntp-checks"
-    parser: json
-    items:
-      - label: device-ntp-servers
-        statement: |
-          All devices will have ntp servers configured
-        expected:
-          type: string
-          value: fact::ntp-servers-east
-        weight: 100
-        source:
-          # A path relative to the root of the object tree
-          path: ".ntp.servers"
-        operator: "contains"
+- name: "ntp_checks"
+  parser: json
+  items:
+    - label: device-ntp-servers
+      statement: |
+        All devices will have ntp servers configured
+      expected:
+        type: string
+        value: fact::ntp-servers-east
+      weight: 100
+      source:
+        # A path relative to the root of the object tree
+        path: ".ntp.servers"
+      operator: "contains"

@@ -1,20 +1,18 @@
 # file: examples/hostname/cisco-ios.yaml
 # (c) 2025 Asymmetric Effort, LLC. <scaldwell@asymmetric-effort.com>
----
-assertions:
-  - name: "hostname-checks"
-    items:
-      - label: "verify device has hostname"
-        applies_to:
-          - "cisco-ios"
-        parser: "cisco-ios"
-        statement: "Each device must have a hostname"
-        expected:
-          type: "pattern"
-          # real RFC-1123 hostname regex (quoted)
-          value: "^[A-Za-z0-9]([A-Za-z0-9\\-]{0,61}[A-Za-z0-9])?$"
-        weight: 10
-        source:
-          # match any line that begins (possibly after spaces) with “hostname <non-space>”
-          pattern: "^\\s*hostname\\s+\\S+"
-        operator: "matches"
+- name: "hostname-checks"
+  items:
+    - label: "verify device has hostname"
+      applies_to:
+        - "cisco-ios"
+      parser: "cisco-ios"
+      statement: "Each device must have a hostname"
+      expected:
+        type: "pattern"
+        # real RFC-1123 hostname regex (quoted)
+        value: "^[A-Za-z0-9]([A-Za-z0-9\\-]{0,61}[A-Za-z0-9])?$"
+      weight: 10
+      source:
+        # match any line that begins (possibly after spaces) with “hostname <non-space>”
+        pattern: "^\\s*hostname\\s+\\S+"
+      operator: "matches"

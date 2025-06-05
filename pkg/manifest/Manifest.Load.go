@@ -31,6 +31,6 @@ func (manifest *Manifest) Load(manifestFilename string) (err error) {
 	}
 
 	log.Debugf("file loaded. validating... '%q'", manifest)
-	//return manifest.Validate()
+	return manifest.Validate()
 	return err
 }

@@ -9,11 +9,11 @@ import (
 	"github.com/sam-caldwell/GoConfAssessor/pkg/utils"
 )
 
-func (m *Manifest) LoadPatterns() error {
+func (manifest *Manifest) LoadPatterns() error {
 	log := logger.Logger
 
-	for i := 0; i < len(m.Patterns); i++ {
-		p := m.Patterns[i]
+	for i := 0; i < len(manifest.Patterns); i++ {
+		p := manifest.Patterns[i]
 		if p.Include == "" {
 			log.Debugf("Pattern %d has no include", i)
 			continue
@@ -26,7 +26,7 @@ func (m *Manifest) LoadPatterns() error {
 		}
 
 		// Append all loaded patterns so they also get checked for nested includes (if you ever support them)
-		m.Patterns = append(m.Patterns, nested...)
+		manifest.Patterns = append(manifest.Patterns, nested...)
 	}
 
 	return nil

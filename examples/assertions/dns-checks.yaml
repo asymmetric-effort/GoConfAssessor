@@ -1,15 +1,13 @@
----
-assertions:
-  - name: "dns-checks"
-    parser: json
-    items:
-      - label: device-dns-servers
-        statement: |
-          All devices will have dns servers configured.
-        expected:
-          type: string
-          value: fact::ntp-servers-east
-        weight: 100
-        source:
-          path: ".dns.servers"
-        operator: "contains"
+- name: "dns-checks"
+  parser: json
+  items:
+    - label: device-dns-servers
+      statement: |
+        All devices will have dns servers configured.
+      expected:
+        type: string
+        value: fact::ntp-servers-east
+      weight: 100
+      source:
+        path: ".dns.servers"
+      operator: "contains"

@@ -1,16 +1,14 @@
----
-assertions:
-  - name: "hostname-checks"
-    items:
-      - label: "verify device has hostname"
-        applies_to:
-          - "juniper"
-        parser: "juniper"
-        statement: "Each device must have a hostname"
-        expected:
-          type: "pattern"
-          value: "^[A-Za-z0-9]([A-Za-z0-9\\-]{0,61}[A-Za-z0-9])?$"
-        weight: 10
-        source:
-          pattern: "^\\s*set\\s+system\\s+host-name\\s+\\S+"
-        operator: "matches"
+- name: "hostname-checks"
+  items:
+    - label: "verify device has hostname"
+      applies_to:
+        - "juniper"
+      parser: "juniper"
+      statement: "Each device must have a hostname"
+      expected:
+        type: "pattern"
+        value: "^[A-Za-z0-9]([A-Za-z0-9\\-]{0,61}[A-Za-z0-9])?$"
+      weight: 10
+      source:
+        pattern: "^\\s*set\\s+system\\s+host-name\\s+\\S+"
+      operator: "matches"
