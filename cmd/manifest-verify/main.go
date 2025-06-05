@@ -26,18 +26,16 @@ func main() {
 	}
 
 	var (
-		rootManifest manifest.RootManifest
+		rootManifest manifest.Manifest
 		err          error
 	)
+
 	// Load and resolve the manifest tree
-	if rootManifest, err = manifest.LoadAndResolve(*manifestPath); err != nil {
-		log.Fatalf("Failed to load or resolve manifest %q: %v", *manifestPath, err)
-	}
-	if err = rootManifest.Validate(); err != nil {
-		log.Fatal(err)
+	if err = rootManifest.Load(*manifestPath); err != nil {
+		log.Fatalf("Manifest(%q) failure: %v", *manifestPath, err)
 	}
 
-	// For now, assume manifest.LoadAndResolve performs all syntax checks.
+	// For now, assume manifest.Load performs all syntax checks.
 	log.Println("Manifest successfully loaded and resolved:", rootManifest)
 	log.Println("Manifest verification passed.")
 }
