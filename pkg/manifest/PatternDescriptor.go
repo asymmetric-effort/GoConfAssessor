@@ -3,6 +3,8 @@
 
 package manifest
 
+// PatternDescriptor - A pattern descriptor describes a reusable regular expression
+// this can be referenced later using the pattern::<name> format
 type PatternDescriptor struct {
 	Include string `yaml:"include,omitempty"`
 

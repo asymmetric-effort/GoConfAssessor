@@ -1,4 +1,4 @@
-// file: pkg/manifest/isValidType.go
+// file: pkg/manifest/Assertion.isValidExpectationType.go
 // (c) 2025 Asymmetric Effort, LLC. <scaldwell@asymmetric-effort.com>
 
 package manifest

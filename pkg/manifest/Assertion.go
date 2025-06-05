@@ -13,9 +13,9 @@ type Assertion struct {
 		Type string `yaml:"type,omitempty"`
 
 		Value interface{} `yaml:"value,omitempty"`
-	} `yaml:"expected,omitempty"`
+	} `yaml:"expected"`
 
-	Weight int `yaml:"weight,omitempty"`
+	Weight uint `yaml:"weight,omitempty"`
 
 	Source struct {
 		Path string `yaml:"path,omitempty"`
