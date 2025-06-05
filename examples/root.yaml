@@ -1,23 +1,47 @@
 ---
+#
+# GENERAL File header
+#
 general:
   name: "root.yaml"
   version: "0.0.1"
   metadata:
     author: "Sam Caldwell"
     created_on: "2025-06-03"
-
+#
+# FACTS: collections of known-true data.
+#
 facts:
-  - name: "ntp-server"
-    include: "ntp-servers.yml"
-  - name: "dns-server"
-    include: "dns-servers.yml"
-
+  - include: "facts/ntp-servers.yml"
+  - include: "facts/dns-servers.yml"
+  - fact:
+      name: "example1"
+      data:
+        - "element1"
+        - "element2"
+        - "element3"
+  - fact:
+      name: "example2"
+      data:
+        mapItem1: value1
+        mapItem2: value2
+        mapItem3: value3
+  - fact:
+      name: "example3"
+      data: true
+  - fact:
+      name: "launch_codes"
+      data: "cpe-1704-tks"
+#
+# PATTERNS: regular expressions used to match configuration patterns
+#
 patterns:
-  - pattern: "rfc1123addresses"
-    include: "patterns/rfc-1123.yaml"
+  - include: "patterns/rfc-1123.yaml"
   - pattern: "simple_identifier"
     regex: "[a-zA-Z][a-zA-Z0-9\\_]{1,64}"
-
+#
+# ASSERTIONS: Claims of factual truth about a configuration file.
+#
 assertions:
   # We can create a chain of all YAML assertion manifests to form a chain for analysis.
   - include: "hostname.yaml"
