@@ -25,7 +25,7 @@ func (manifest *Manifest) LoadFacts() error {
 		}
 
 		log.Debugf("Fact %d includes '%s'", i, f.Include)
-		var nested []FactDescriptor
+		var nested []FactCollection
 		if err := utils.LoadYaml(f.Include, &nested); err != nil {
 			return fmt.Errorf("failed to load facts from %s: %w", f.Include, err)
 		}

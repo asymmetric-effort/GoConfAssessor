@@ -25,12 +25,12 @@ func (manifest *Manifest) Load(manifestFilename string) (err error) {
 		return fmt.Errorf("failed to unmarshal YAML %s: %w", manifestFile.GetFile(), err)
 	}
 
-	log.Debugf("-------file loaded. resolving-------")
 	if err = manifest.ResolveIncludes(); err != nil {
 		return err
 	}
+	if err = manifest.PruneIncludes(); err != nil {
+		return err
+	}
 
-	log.Debugf("file loaded. validating... '%q'", manifest)
 	return manifest.Validate()
-	return err
 }

@@ -20,20 +20,24 @@ package manifest
 //   - Operator is one of matches|contains|equals
 func (manifest *Manifest) Validate() (err error) {
 
-	// validate the general section
 	if err = manifest.General.Validate(); err != nil {
 		return err
 	}
-	for _, fact := range manifest.Facts {
+
+	for i, fact := range manifest.Facts {
+		log.Debugf("Fact %d validating: %q", i, fact)
 		if err = fact.Validate(); err != nil {
 			return err
 		}
+		log.Debugf("Fact %d validated", i)
 	}
+
 	for _, pattern := range manifest.Patterns {
 		if err = pattern.Validate(); err != nil {
 			return err
 		}
 	}
+
 	for _, assertion := range manifest.Assertions {
 		if err = assertion.Validate(); err != nil {
 			return nil

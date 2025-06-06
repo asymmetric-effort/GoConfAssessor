@@ -13,7 +13,7 @@ type Manifest struct {
 	// Facts are data which can be defined in files and referenced by assertions.
 	// For example, a "fact" might be a list of dns servers assertions can reference
 	// to validate that the analyzed config file contains these facts.
-	Facts []FactDescriptor `yaml:"facts,omitempty"`
+	Facts []FactCollection `yaml:"facts,omitempty"`
 	//
 	// Patterns can be defined in any file.  These are reusable global-scope items
 	// A pattern is a regular expression used by assertions to match parts of an

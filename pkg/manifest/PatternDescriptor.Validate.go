@@ -7,6 +7,9 @@ import (
 
 // Validate - validate the PatternDescriptor
 func (descriptor *PatternDescriptor) Validate() (err error) {
+	if descriptor.Include != "" {
+		return nil
+	}
 	if err = utils.ValidIdentifier(descriptor.Pattern); err != nil {
 		return err
 	}

@@ -6,6 +6,7 @@ import (
 	"flag"
 	"github.com/sam-caldwell/GoConfAssessor/pkg/logger"
 	"github.com/sam-caldwell/GoConfAssessor/pkg/manifest"
+	"gopkg.in/yaml.v3"
 	"os"
 )
 
@@ -42,6 +43,11 @@ func main() {
 		log.Fatalf("Manifest(%q) failure: %v", *manifestPath, err)
 	}
 
+	var output []byte
+	if output, err = yaml.Marshal(rootManifest); err != nil {
+		log.Fatal(err)
+	}
 	// For now, assume manifest.Load performs all syntax checks.
-	log.Info("Manifest successfully loaded and resolved:", rootManifest)
+	log.Debug(string(output))
+	log.Info("Manifest successfully loaded and resolved")
 }

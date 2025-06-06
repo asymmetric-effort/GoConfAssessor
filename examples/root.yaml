@@ -12,26 +12,23 @@ general:
 # FACTS: collections of known-true data.
 #
 facts:
+  # included facts can only include facts, nothing more...
   - include: "examples/facts/ntp-servers.yml"
   - include: "examples/facts/dns-servers.yml"
-  - fact:
-      name: "example1"
-      data:
-        - "element1"
-        - "element2"
-        - "element3"
-  - fact:
-      name: "example2"
-      data:
-        mapItem1: value1
-        mapItem2: value2
-        mapItem3: value3
-  - fact:
-      name: "example3"
-      data: true
-  - fact:
-      name: "launch_codes"
-      data: "cpe-1704-tks"
+  - fact: "example1"
+    data:
+      - "element1"
+      - "element2"
+      - "element3"
+  - fact: "example2"
+    data:
+      mapItem1: value1
+      mapItem2: value2
+      mapItem3: value3
+  - fact: "example3"
+    data: true
+  - fact: "launch_codes"
+    data: "cpe-1704-tks"
 #
 # PATTERNS: regular expressions used to match configuration patterns
 #

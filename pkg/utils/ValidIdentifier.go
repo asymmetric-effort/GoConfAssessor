@@ -8,7 +8,7 @@ import (
 // ValidIdentifier - validating the identifier pattern
 func ValidIdentifier(s string) error {
 
-	const identifierPattern = "^[a-zA-Z][a-zA-Z0-9\\_\\-\\.]{0-63}[a-zA-Z0-9]$"
+	const identifierPattern = "^[a-zA-Z]{0,1}[a-zA-Z0-9_\\-\\.]{0,63}[a-zA-Z0-9]$"
 
 	if pattern := regexp.MustCompile(identifierPattern); pattern.MatchString(s) {
 
