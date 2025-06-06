@@ -4,6 +4,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/sam-caldwell/GoConfAssessor/pkg/logger"
 	"github.com/sam-caldwell/GoConfAssessor/pkg/manifest"
 	"gopkg.in/yaml.v3"
@@ -48,6 +49,6 @@ func main() {
 		log.Fatal(err)
 	}
 	// For now, assume manifest.Load performs all syntax checks.
-	log.Debug(string(output))
-	log.Info("Manifest successfully loaded and resolved")
+	fmt.Printf(string(output))
+	log.Debug("Manifest successfully loaded and resolved")
 }
