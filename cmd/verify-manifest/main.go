@@ -1,4 +1,4 @@
-// file: cmd/manifest-verify/main.go
+// file: cmd/verify-manifest/main.go
 // (c) 2025 Asymmetric Effort, LLC. <scaldwell@asymmetric-effort.com>
 package main
 

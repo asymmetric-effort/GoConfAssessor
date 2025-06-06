@@ -21,5 +21,5 @@ analyze --report-dir /path/to/output-reports/ --output score.yaml
 
 ## Verify manifest
 ```shell
-manifest-verify --manifest /path/to/rootAssessment.yaml 
+verify-manifest --manifest /path/to/rootAssessment.yaml 
 ```
