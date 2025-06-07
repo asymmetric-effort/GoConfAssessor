@@ -29,5 +29,12 @@ func (manifest *Manifest) Load(manifestFilename string) (err error) {
 		return err
 	}
 
+	if err = manifest.ResolveFacts(); err != nil {
+		return err
+	}
+	if err = manifest.ResolvePatterns(); err != nil {
+		return err
+	}
+
 	return manifest.Validate()
 }
