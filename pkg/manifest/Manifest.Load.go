@@ -5,11 +5,8 @@ package manifest
 
 import (
 	"fmt"
-	"github.com/sam-caldwell/GoConfAssessor/pkg/logger"
 	"github.com/sam-caldwell/GoConfAssessor/pkg/utils"
 )
-
-var log = logger.Logger
 
 // Load loads the root manifest from manifestFile, resolves includes, prefixes labels, and returns a Manifest.
 func (manifest *Manifest) Load(manifestFilename string) (err error) {

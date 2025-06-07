@@ -9,19 +9,11 @@ type Assertion struct {
 
 	Statement string `yaml:"statement,omitempty"`
 
-	Expected struct {
-		Type string `yaml:"type,omitempty"`
-
-		Value interface{} `yaml:"value,omitempty"`
-	} `yaml:"expected"`
+	Expected Expectation `yaml:"expected"`
 
 	Weight uint `yaml:"weight,omitempty"`
 
-	Source struct {
-		Path string `yaml:"path,omitempty"`
-
-		Pattern string `yaml:"pattern,omitempty"`
-	} `yaml:"source,omitempty"`
+	Source ActualSource `yaml:"source,omitempty"`
 
 	Operator string `yaml:"operator,omitempty"`
 }
