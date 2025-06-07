@@ -1,4 +1,3 @@
 package parsers
 
-type CiscoParser struct {
-}
+type CiscoParser struct{}

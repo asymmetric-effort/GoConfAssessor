@@ -14,11 +14,11 @@ import (
 func main() {
 	// Define flags
 	debug := flag.Bool("debug", false, "Enable debug-level logging")
-	manifestPath := flag.String("manifest", "", "Path to root YAML manifest (required)")
+	manifestFile := flag.String("manifest", "", "Path to root YAML manifest (required)")
 	flag.Parse()
 
 	// Verify required flag
-	if *manifestPath == "" {
+	if *manifestFile == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -40,8 +40,8 @@ func main() {
 	)
 
 	// Load and resolve the manifest tree
-	if err = rootManifest.Load(*manifestPath); err != nil {
-		log.Fatalf("Manifest(%q) failure: %v", *manifestPath, err)
+	if err = rootManifest.Load(*manifestFile); err != nil {
+		log.Fatalf("Manifest(%q) failure: %v", *manifestFile, err)
 	}
 
 	var output []byte

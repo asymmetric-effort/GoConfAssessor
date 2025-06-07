@@ -10,6 +10,11 @@ import (
 // Logger is the global logrus.Logger instance.
 var Logger = logrus.New()
 
+const (
+	DebugStr = "debug"
+	InfoStr  = "info"
+)
+
 func init() {
 	// Set the format (text, JSON, etc.) and default level here.
 	Logger.SetFormatter(&logrus.TextFormatter{
@@ -27,4 +32,12 @@ func SetLevel(level string) error {
 	}
 	Logger.SetLevel(lvl)
 	return nil
+}
+
+func IsDebug(debug bool) string {
+	if debug {
+		return DebugStr
+	} else {
+		return InfoStr
+	}
 }
