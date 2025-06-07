@@ -1,0 +1,19 @@
+# /etc/ssh/ssh_config — OpenSSH Client Configuration
+
+Host *
+    ForwardAgent no
+    ForwardX11 no
+    RhostsRSAAuthentication no
+    RSAAuthentication yes
+    PasswordAuthentication yes
+    HostbasedAuthentication no
+    GSSAPIAuthentication yes
+    GSSAPIDelegateCredentials no
+    BatchMode no
+    CheckHostIP yes
+    StrictHostKeyChecking ask
+    UserKnownHostsFile ~/.ssh/known_hosts
+    IdentityFile ~/.ssh/id_rsa
+    IdentityFile ~/.ssh/id_ed25519
+    Port 22
+    Protocol 2

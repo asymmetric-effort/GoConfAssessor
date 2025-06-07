@@ -1,0 +1,124 @@
+## Arista EOS Configuration with feature parity to Cisco & Juniper examples
+
+hostname Arista-1
+
+! === LOCAL USERS & AAA ===
+username admin secret AdminPass123
+username hashedPass secret 8 $5$e5d4efa3125b0197937e17b38442b4d67b0818a8f6485bd1f8ad5486dbf8e49b
+
+aaa group server tacacs+ TAC_GROUP
+   server 10.0.0.50
+!
+aaa authentication login default group TAC_GROUP local
+aaa authorization exec default group TAC_GROUP local
+aaa accounting exec default start-stop group TAC_GROUP
+
+! === SNMP & SYSLOG ===
+snmp-server community public ro
+snmp-server community private rw
+snmp-server contact NetOps
+snmp-server location "Data Center 1"
+!
+logging host 192.0.2.50 transport udp port 514
+logging source-interface Loopback0
+logging facility local7
+logging level notifications
+
+! === NTP & DNS ===
+ntp server 192.168.100.1 prefer
+!
+ip name-server vrf default 8.8.8.8
+ip name-server vrf default 8.8.4.4
+!
+clock timezone America/Chicago
+
+! === MANAGEMENT API ===
+management api http-commands
+   no shutdown
+
+! === INTERFACES ===
+interface Ethernet1
+   description Uplink to Core Switch
+   switchport mode trunk
+   switchport trunk allowed vlan 10-30,99
+   service-policy input QOS-POLICY
+!
+interface Ethernet2
+   description Server Farm Uplink (10G)
+   switchport mode trunk
+   switchport trunk allowed vlan 10,20
+   service-policy input QOS-POLICY
+!
+interface Ethernet3
+   description 25GbE Link to Storage Array
+   no switchport
+   ip address 192.168.200.1/24
+   service-policy input QOS-POLICY
+!
+interface Ethernet4
+   description 100GbE Spine Link
+   no switchport
+   ip address 10.1.1.1/30
+   service-policy input QOS-POLICY
+!
+interface Loopback0
+   ip address 10.254.254.254/32
+
+! === VRF & ROUTING ===
+vrf definition CUSTOMER_A
+   rd 65000:100
+!
+ip routing
+ip routing vrf CUSTOMER_A
+ip route vrf CUSTOMER_A 0.0.0.0/0 192.168.100.254
+
+! === NAT & ACL ===
+ip access-list standard ACL-MGMT
+   permit 10.0.0.0/24
+   deny any
+!
+ip nat inside source list ACL-MGMT interface Ethernet1 overload
+
+! === BGP ===
+router bgp 65000
+   router-id 10.254.254.254
+   neighbor 198.51.100.1 remote-as 65100
+   neighbor 198.51.100.1 description Upstream-ISP
+   neighbor 198.51.100.1 update-source Loopback0
+   !
+   address-family ipv4 unicast
+     network 10.0.0.0/24
+     neighbor 198.51.100.1 activate
+     neighbor 198.51.100.1 route-map RM-EXPORT out
+   exit-address-family
+
+! === OSPF ===
+router ospf 1
+   router-id 10.254.254.254
+   network 192.168.10.0/24 area 0
+   network 192.168.20.0/24 area 0
+   network 192.168.30.0/24 area 0
+   network 10.254.254.254/32 area 0
+   passive-interface default
+   no passive-interface Ethernet1
+
+! === QOS ===
+class-map match-any VOICE
+   match dscp ef
+!
+class-map match-any CRITICAL
+   match access-group name ACL-MGMT
+!
+policy-map QOS-POLICY
+   class VOICE
+     priority percent 30
+   class CRITICAL
+     bandwidth percent 20
+   class class-default
+     fair-queue
+
+! === MANAGEMENT ACCESS ===
+management ssh
+   vrf default
+
+! === END ===

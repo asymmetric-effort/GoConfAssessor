@@ -1,0 +1,94 @@
+## 100% confidence — F5 BIG-IP tmsh Configuration with feature parity
+
+# === LOCAL USERS & AAA ===
+tmsh modify auth user admin password plaintext AdminPass123 shell bash
+tmsh create auth user hashedPass password "{SHA256}$5$e5d4efa3125b0197937e17b38442b4d67b0818a8f6485bd1f8ad5486dbf8e49b" shell bash
+
+# TACACS+ server and remote role
+tmsh create auth tacacs-remote-server TACPLUS1 { host 10.0.0.50 secret TacacsKey1 timeout 5 }
+tmsh create auth remote-role TACACS-ADMINS { servers replace-all { TACPLUS1 } fallback-role admin }
+
+# Apply remote-role to login
+tmsh modify auth radius remote-role TACACS-ADMINS
+
+# === SNMP ===
+tmsh modify sys snmp config { contact "NetOps" location "Data Center 1" engineId 800007e0000 }
+tmsh create sys snmp community public { community public access ro }
+tmsh create sys snmp community private { community private access rw }
+tmsh create sys snmp trap remote { name trap1 community public trap-version v2c addresses add { 10.0.0.200 } }
+
+# === SYSLOG FORWARDING ===
+tmsh modify sys syslog remote-servers add { rs1 { host 192.0.2.50 port 514 protocol udp } }
+tmsh modify sys syslog config { device-option source-address 10.254.254.254 facility local7 }
+
+# === NTP & DNS ===
+tmsh create sys ntp server 192.168.100.1 { prefer }
+tmsh modify sys dns name-servers add { 8.8.8.8 8.8.4.4 }
+
+# === VLANs, Self-IP, and Route ===
+tmsh create net vlan VLAN99 { interfaces add { 1.1 } tag 99 }
+tmsh create net self Self_IP_VLAN99 { address 10.254.254.254/32 vlan VLAN99 allow-service all }
+
+# Static route for default gateway
+tmsh create sys route 0.0.0.0/0 { gw 192.168.100.254 }
+
+# === SSL VPN (APM) ===
+tmsh create apm profile access SSL_VPN_Profile {
+    defaults-from /Common/apm_default
+    policy /Common/SSLVPN_Policy
+}
+# (Assumes an APM policy named SSLVPN_Policy exists, with pool and authentication settings.)
+
+# === IPsec SITE-TO-SITE VPN ===
+tmsh create net ipsec ike-peer VPN-Peer {
+    address 198.51.100.2
+    authentication pre-shared
+    pre-shared-key PreSharedKey
+    local-address 10.254.254.254
+    dpd-interval 10
+    dpd-retry 5
+    ike-crypto-profile standard
+}
+tmsh create net ipsec crypto ipsec-prop {
+    encryption aes256
+    authentication sha256
+}
+tmsh create net ipsec vpn Site-to-Site {
+    peer VPN-Peer
+    local-ip 10.254.254.254
+    remote-ip 198.51.100.2
+    crypto-client-profile ipsec-prop
+    traffic-selector add { local 192.168.10.0/24 remote 172.16.0.0/24 }
+}
+
+# === NAT & POOLS (analogous to Cisco NAT & load‐balancing) ===
+tmsh create ltm pool WEB_POOL members add { 192.168.10.10:80 192.168.10.11:80 }
+tmsh create ltm virtual VS_HTTP {
+    destination 192.168.20.100:80
+    mask 255.255.255.255
+    pool WEB_POOL
+    profiles add { http tcp }
+    source-address-translation { type automap }
+}
+
+# === QOS ===
+tmsh create net qos policy QOS-POLICY {
+    class-map VOICE { dscp-match 46 }
+    class-map CRITICAL { match access-group ACL-MGMT }
+    policy-map QOS_POLICY {
+        class VOICE { priority-bandwidth 30 }
+        class CRITICAL { bandwidth-percentage 20 }
+    }
+}
+tmsh create net qos vlan QOS-VLAN99 { vlan 99 policy QOS_POLICY }
+
+# === ACCESS-LIST ===
+tmsh create security firewall acl ACL-MGMT {
+    rules add {
+        allow-mgmt { action accept source 10.0.0.0/24 destination any }
+        deny-all    { action drop }
+    }
+}
+
+# === BANNERS ===
+tmsh modify sys global-settings { login-banner “Unauthorized access is prohibited” }

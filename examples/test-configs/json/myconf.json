@@ -1,0 +1,48 @@
+// file: example.json
+{
+  "general": {
+    "app_name": "MyApp",
+    "version": "1.2.3",
+    "debug": true
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8080,
+    "use_ssl": false
+  },
+  "database": {
+    "user": "dbuser",
+    "password": "s3cr3t",
+    "hosts": [
+      "db1.example.com",
+      "db2.example.com",
+      "db3.example.com"
+    ],
+    "max_connections": 50,
+    "timeout": 30
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "/var/log/myapp/app.log",
+    "rotate": true,
+    "rotate_size": "10MB"
+  },
+  "features": {
+    "enable_feature_x": "yes",
+    "enable_feature_y": "no",
+    "experimental_modes": [
+      "alpha",
+      "beta"
+    ]
+  },
+  "paths": {
+    "data_dir": "/var/lib/myapp/data",
+    "cache_dir": "/var/cache/myapp",
+    "temp_dir": "/tmp"
+  },
+  "thresholds": {
+    "cpu": 75,
+    "memory": 80,
+    "disk": 90
+  }
+}

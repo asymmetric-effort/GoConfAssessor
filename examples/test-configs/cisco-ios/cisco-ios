@@ -1,0 +1,191 @@
+! Example Cisco IOS XE Configuration – extended with hashed user, SSL VPN, IPSec site-to-site VPN, and syslog forwarding
+version 16.12
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+
+hostname ISP-R1
+
+! === LOCAL USERS & AAA ===
+username admin privilege 15 secret AdminPass123
+username hashedPass secret 8 $8$e5d4efa3125b0197937e17b38442b4d67b0818a8f6485bd1f8ad5486dbf8e49b
+
+aaa new-model
+!
+! TACACS+ server definition
+tacacs server TACPLUS1
+ address ipv4 10.0.0.50
+ key TacacsKey1
+!
+aaa group server tacacs+ TAC_GROUP
+ server name TACPLUS1
+!
+aaa authentication login default group TAC_GROUP local
+aaa authorization exec default group TAC_GROUP local
+aaa accounting exec default start-stop group TAC_GROUP
+aaa accounting commands 15 default start-stop group TAC_GROUP
+
+! === SNMP & LOGGING ===
+snmp-server community public RO
+snmp-server location "Data Center 1"
+snmp-server contact "NetOps"
+snmp-server host 10.0.0.200 version 2c public
+
+logging buffered 64000 debugging
+logging trap informational
+logging host 10.0.0.200
+
+! === SYSLOG FORWARDING ===
+! send all logs to remote syslog server
+logging host 192.0.2.50 transport udp port 514
+logging source-interface Loopback0
+logging facility local7
+
+! === TIME & NTP ===
+clock timezone CST -6
+clock summer-time CDT recurring
+ntp server 192.168.100.1 prefer
+
+! === DOMAIN & DNS ===
+ip domain name example.com
+ip name-server 8.8.8.8
+ip name-server 8.8.4.4
+
+! === SSL CLIENT VPN (AnyConnect) ===
+crypto key generate rsa label SSLVPN_KEY modulus 2048
+ip http secure-server
+!
+webvpn
+ enable GigabitEthernet0/0 ssl authenticate verify all
+ svc image disk0:/anyconnect.pkg 1
+ svc enable
+ inservice
+!
+group-policy SSLVPN_POLICY internal
+group-policy SSLVPN_POLICY attributes
+ dns-server value 8.8.8.8
+ vpn-tunnel-protocol ssl-client
+ default-domain value example.com
+!
+tunnel-group SSLVPN_GROUP type remote-access
+tunnel-group SSLVPN_GROUP general-attributes
+ default-group-policy SSLVPN_POLICY
+tunnel-group SSLVPN_GROUP webvpn-attributes
+ group-alias SSLVPN enable
+
+! === IPSec SITE-TO-SITE VPN ===
+crypto isakmp policy 10
+ encryption aes 256
+ hash sha256
+ authentication pre-share
+ group 14
+ lifetime 3600
+!
+crypto isakmp key PreSharedKey address 198.51.100.2
+!
+crypto ipsec transform-set TS esp-aes 256 esp-sha256-hmac
+ mode tunnel
+!
+crypto map SITE2SITE 10 ipsec-isakmp
+ set peer 198.51.100.2
+ set transform-set TS
+ match address 110
+!
+interface GigabitEthernet0/1
+ crypto map SITE2SITE
+
+access-list 110 permit ip 192.168.10.0 0.0.0.255 172.16.0.0 0.0.0.255
+
+! === INTERFACES ===
+interface GigabitEthernet0/0
+ description Uplink to Core Switch
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,20,30,99
+ spanning-tree portfast trunk
+ service-policy output QOS-POLICY
+!
+interface TenGigabitEthernet0/1
+ description Server Farm Uplink
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+ spanning-tree portfast trunk
+!
+interface TwentyFiveGigE1/0/1
+ description 25GbE Link to Storage Array
+ no switchport
+ ip address 192.168.200.1 255.255.255.0
+!
+interface HundredGigE1/1/1
+ description 100GbE Spine Link
+ no switchport
+ ip address 10.1.1.1 255.255.255.252
+!
+interface Loopback0
+ description Management Loopback
+ ip address 10.254.254.254 255.255.255.255
+
+! === VRF & ROUTING ===
+ip vrf CUSTOMER_A
+ rd 65000:100
+ route-target export 65000:100
+ route-target import 65000:100
+
+ip routing
+ip route vrf CUSTOMER_A 0.0.0.0 0.0.0.0 192.168.100.254
+
+! === NAT & ACL ===
+access-list 10 permit 192.168.10.0 0.0.0.255
+ip nat inside source list 10 interface GigabitEthernet0/0 overload
+
+! === BGP ===
+router bgp 65000
+ bgp log-neighbor-changes
+ neighbor 198.51.100.1 remote-as 65100
+ neighbor 198.51.100.1 description Upstream-ISP
+ neighbor 198.51.100.1 ebgp-multihop 2
+ neighbor 198.51.100.1 update-source Loopback0
+ address-family ipv4 unicast
+  network 10.0.0.0 mask 255.255.255.0
+  neighbor 198.51.100.1 activate
+ exit-address-family
+
+! === OSPF ===
+router ospf 1
+ router-id 10.254.254.254
+ log-adjacency-changes
+ network 192.168.10.0 0.0.0.255 area 0
+ network 192.168.20.0 0.0.0.255 area 0
+ network 192.168.30.0 0.0.0.255 area 0
+ network 10.254.254.254 0.0.0.0 area 0
+ passive-interface default
+ no passive-interface GigabitEthernet0/0
+
+! === QOS ===
+class-map match-any VOICE
+ match ip dscp ef
+class-map match-any CRITICAL
+ match access-group name ACL-MGMT
+policy-map QOS-POLICY
+ class VOICE
+  priority percent 30
+ class CRITICAL
+  bandwidth percent 20
+ class class-default
+  fair-queue
+
+! === LINES ===
+line con 0
+ logging synchronous
+line vty 0 4
+ login authentication default
+ transport input ssh
+ exec-timeout 5 0
+
+! === BANNERS ===
+banner motd ^
+Unauthorized access is prohibited
+^
+
+end

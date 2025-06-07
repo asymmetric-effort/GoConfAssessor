@@ -1,0 +1,70 @@
+# /etc/ssh/sshd_config — OpenSSH Server Configuration
+
+# Port and address
+Port 22
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+
+# HostKeys for protocol version 2
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Authentication
+PermitRootLogin prohibit-password
+#PermitRootLogin no
+#PermitRootLogin without-password
+
+PasswordAuthentication yes
+#PubkeyAuthentication yes
+#ChallengeResponseAuthentication no
+#KerberosAuthentication no
+#GSSAPIAuthentication no
+
+# Change to yes to enable tunnelled clear text passwords
+#PermitEmptyPasswords no
+
+# Use PAM (Pluggable Authentication Modules)
+UsePAM yes
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Max sessions and connections
+#MaxAuthTries 6
+#MaxSessions 10
+
+# Subsystem for SFTP
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+# Banner
+#Banner /etc/issue.net
+
+# ClientAlive settings
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+
+# X11 forwarding
+#X11Forwarding no
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+
+# TCP forwarding
+#AllowTcpForwarding yes
+#GatewayPorts no
+
+# Allow or deny users/groups
+#AllowUsers user1 user2
+#AllowGroups sshusers
+#DenyUsers baduser
+#DenyGroups nogroup
+
+# Use DNS for client hostnames
+#UseDNS no
+
+# Subsystem for internal-sftp (chrooted)
+#Match group sftponly
+#    ChrootDirectory %h
+#    ForceCommand internal-sftp

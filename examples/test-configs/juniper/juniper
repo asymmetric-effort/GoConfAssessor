@@ -1,0 +1,356 @@
+## Juniper SRX Configuration with feature parity to the Cisco example
+
+configuration {
+    system {
+        host-name ISP-R1;
+        root-authentication {
+            encrypted-password "$5$rounds=10000$abc123xyz$y0uRHaShEdPaSsw0rD...";  ## sha256‐style encrypted password
+        }
+        login {
+            user admin {
+                class super-user;
+                authentication {
+                    encrypted-password "$5$rounds=10000$a1b2c3d4$3nCrYpTeDpAsSwOrD...";
+                }
+            }
+            user hashedPass {
+                class super-user;
+                authentication {
+                    encrypted-password "$5$rounds=10000$e5d4efa3$125b0197937e17b3...";
+                }
+            }
+            authentication-order [ tacplus password ];
+            message “Unauthorized access is prohibited”;
+        }
+        services {
+            ssh;
+            web-management {
+                http {
+                    interface ge-0/0/0.0;
+                }
+                https {
+                    interface ge-0/0/0.0;
+                }
+            }
+            tacplus {
+                authentication-order [ tacplus password ];
+                server TACPLUS1 {
+                    address 10.0.0.50;
+                    secret TacacsKey1;
+                }
+            }
+            snmp {
+                community public {
+                    authorization read-only;
+                }
+                community private {
+                    authorization read-write;
+                }
+                trap-group TRAPS {
+                    targets {
+                        10.0.0.200;
+                    }
+                }
+                location "Data Center 1";
+                contact "NetOps";
+            }
+            syslog {
+                host 192.0.2.50 {
+                    any any;
+                    port 514;
+                    protocol udp;
+                }
+                source-address 10.254.254.254;
+                facility local7;
+            }
+            ntp {
+                server 192.168.100.1 {
+                    prefer;
+                }
+            }
+        }
+        name-server {
+            8.8.8.8;
+            8.8.4.4;
+        }
+        domain-search {
+            example.com;
+        }
+        time-zone America/Chicago;
+        system-services {
+            automated-commit;
+        }
+    }
+
+    chassis {
+        boot {
+            image junos-install-media;
+        }
+    }
+
+    interfaces {
+        ge-0/0/0 {
+            description "Uplink to Core Switch";
+            unit 0 {
+                family ethernet-switching {
+                    interface-mode trunk;
+                    vlan {
+                        members [10 20 30 99];
+                    }
+                    native-vlan-id 99;
+                    storm-control {
+                        all;
+                    }
+                }
+            }
+            gigether-options {
+                port-mode trunk;
+            }
+        }
+        xe-0/0/1 {
+            description "Server Farm Uplink (10G)";
+            unit 0 {
+                family ethernet-switching {
+                    interface-mode trunk;
+                    vlan {
+                        members [10 20];
+                    }
+                }
+            }
+        }
+        et-0/0/2 {
+            description "25GbE to Storage Array";
+            unit 0 {
+                family inet {
+                    address 192.168.200.1/24;
+                }
+            }
+        }
+        et-0/0/3 {
+            description "100GbE Spine Link";
+            unit 0 {
+                family inet {
+                    address 10.1.1.1/30;
+                }
+            }
+        }
+        lo0 {
+            unit 0 {
+                family inet {
+                    address 10.254.254.254/32;
+                }
+            }
+        }
+        st0 {
+            unit 0 {
+                family inet;
+            }
+        }
+    }
+
+    security {
+        zones {
+            security-zone trust {
+                interfaces [ ge-0/0/0.0 xe-0/0/1.0 et-0/0/2.0 et-0/0/3.0 ];
+            }
+            security-zone untrust {
+                interfaces [ ge-0/0/0.0 ];  ## also VPN tunnel on st0.0
+            }
+        }
+        ike {
+            proposals ike-prop {
+                authentication-method pre-shared-keys;
+                dh-group group14;
+                encryption-algorithm aes-256-cbc;
+                authentication-algorithm sha256;
+                lifetime-seconds 3600;
+            }
+            policy ike-policy {
+                mode main;
+                proposal ike-prop;
+            }
+            gateway ike-gw-peer {
+                ike-policy ike-policy;
+                address 198.51.100.2;
+                external-interface ge-0/0/0.0;
+                dead-peer-detection {
+                    interval 10;
+                    threshold 5;
+                }
+                pre-shared-key {
+                    ascii-text PreSharedKey;
+                }
+            }
+        }
+        ipsec {
+            vpn site-to-site {
+                bind-interface st0.0;
+                ike {
+                    gateway ike-gw-peer;
+                    ipsec-policy ipsec-prop;
+                }
+                traffic-selector {
+                    local-ip 192.168.10.0/24;
+                    remote-ip 172.16.0.0/24;
+                }
+            }
+            proposals ipsec-prop {
+                protocol esp;
+                authentication-algorithm hmac-sha256-128;
+                encryption-algorithm aes-256-cbc;
+                lifetime-seconds 3600;
+            }
+        }
+        nat {
+            source {
+                rule-set NAT-OUT {
+                    from zone trust;
+                    to zone untrust;
+                    rule SNAT {
+                        match {
+                            source-address 192.168.10.0/24;
+                        }
+                        then {
+                            source-nat {
+                                interface;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        vpn {
+            ssl {
+                server ssl-vpn {
+                    listen-client {
+                        port 443;
+                    }
+                    dh {
+                        group 14;
+                    }
+                    authentication-order [ password ];
+                    client {
+                        domain example.com;
+                        pool {
+                            address-range {
+                                10.10.10.10 to 10.10.10.50;
+                            }
+                        }
+                    }
+                    service {
+                        tcp-proxy;
+                        udp-proxy;
+                    }
+                    web {
+                        realm default {
+                            role all-users;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    routing-options {
+        static {
+            route 0.0.0.0/0 next-hop 192.168.100.254;
+        }
+    }
+
+    routing-instances {
+        CUSTOMER_A {
+            instance-type virtual-router;
+            interface st0.0;
+            route-distinguisher 65000:100;
+            vrf-target {
+                export 65000:100;
+                import 65000:100;
+            }
+        }
+    }
+
+    protocols {
+        bgp {
+            group EBGP-UPSTREAM {
+                type external;
+                peer-as 65100;
+                neighbor 198.51.100.1 {
+                    description "Upstream-ISP";
+                    local-address 10.254.254.254;
+                    export [ RM-EXPORT ];
+                }
+            }
+            local-as 65000;
+        }
+        ospf {
+            area 0.0.0.0 {
+                interface ge-0/0/0.0 {
+                    interface-type p2p;
+                }
+                interface xe-0/0/1.0 {
+                    interface-type p2p;
+                }
+                interface et-0/0/2.0 {
+                    interface-type p2p;
+                }
+                interface et-0/0/3.0 {
+                    interface-type p2p;
+                }
+                interface lo0.0 {
+                    passive;
+                }
+            }
+        }
+    }
+
+    firewall {
+        family inet {
+            filter ACL-MGMT {
+                term allow-mgmt {
+                    from {
+                        source-address 10.0.0.0/24;
+                    }
+                    then accept;
+                }
+                term deny-all {
+                    then discard;
+                }
+            }
+        }
+    }
+
+    class-of-service {
+        schedulers {
+            voice-scheduler {
+                transmit-rate percent 30;
+            }
+            critical-scheduler {
+                transmit-rate percent 20;
+            }
+            default-scheduler {
+                transmit-rate percent 50;
+            }
+        }
+        scheduler-maps {
+            QOS-POLICY {
+                forwarding-class voice-scheduler;
+                forwarding-class critical-scheduler;
+                forwarding-class default-scheduler;
+            }
+        }
+        interfaces {
+            ge-0/0/0.0 {
+                scheduler-map QOS-POLICY;
+            }
+            xe-0/0/1.0 {
+                scheduler-map QOS-POLICY;
+            }
+            et-0/0/2.0 {
+                scheduler-map QOS-POLICY;
+            }
+            et-0/0/3.0 {
+                scheduler-map QOS-POLICY;
+            }
+        }
+    }
+}
