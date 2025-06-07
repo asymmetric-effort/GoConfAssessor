@@ -38,16 +38,16 @@ func main() {
 	if err = rootManifest.Load(*manifestFile); err != nil {
 		log.Error(err)
 	}
-	parser := parsers.New(confType)
+	//parser := parsers.New(confType)
 	err = filepath.Walk(*sourceDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil || info.IsDir() {
 			// skip files or directories we can't stat or just directories in general.
 			return nil
 		}
-		data, err := os.ReadFile(path)
-		if err != nil {
-			return nil
-		}
+		//data, err := os.ReadFile(path)
+		//if err != nil {
+		//	return nil
+		//}
 
 		report.Start(*reportDir)
 		if err = report.Write(); err != nil {

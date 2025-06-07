@@ -12,6 +12,11 @@ import (
 )
 
 func main() {
+	var (
+		err          error
+		output       []byte
+		rootManifest manifest.Manifest
+	)
 	// Define flags
 	debug := flag.Bool("debug", false, "Enable debug-level logging")
 	manifestFile := flag.String("manifest", "", "Path to root YAML manifest (required)")
@@ -23,28 +28,18 @@ func main() {
 		os.Exit(1)
 	}
 	log := logger.Logger
-	if *debug {
-		if err := logger.SetLevel("debug"); err != nil {
-			log.Fatalf("error setting log level: %v", err)
-		}
-	} else {
-		if err := logger.SetLevel("info"); err != nil {
-			log.Fatalf("error setting log level: %v", err)
-		}
+	if err = logger.SetLevel(logger.IsDebug(*debug)); err != nil {
+		log.Error(err)
 	}
 	log.Debug("logger ready")
 
-	var (
-		rootManifest manifest.Manifest
-		err          error
-	)
-
 	// Load and resolve the manifest tree
+	log.Debug("loading manifest")
 	if err = rootManifest.Load(*manifestFile); err != nil {
 		log.Fatalf("Manifest(%q) failure: %v", *manifestFile, err)
 	}
 
-	var output []byte
+	log.Debug("marshall manifest")
 	if output, err = yaml.Marshal(rootManifest); err != nil {
 		log.Fatal(err)
 	}
